@@ -9,7 +9,7 @@
   ],
   "private": false,
   "dependencies": {
-    "wiring-pi": "2.1.1"
+    "native-gpio": "0.1.0"
   },
   "engines": {
     "node": "*"
