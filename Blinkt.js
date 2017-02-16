@@ -1,27 +1,21 @@
 "use strict";
 
-var gpio = require('native-gpio');
+const Gpio = require('onoff').Gpio;
 
-var gpioCLK = new gpio.GPIO(24);
-var gpioDAT = new gpio.GPIO(23);
+const clk = new Gpio(24, 'out');
+const dat = new Gpio(23, 'out');
 
 const Blinkt = function () {};
 
 /**
- * Connects to the GPIO and sets the GPIO pin modes. Must be called
- * before any other commands. All pixels will start off white at
- * full brightness by default.
+ * All pixels will start off white at full brightness by default.
  */
 Blinkt.prototype.setup = function setup () {
-	// Set pin mode to output
-	gpioCLK.direction(gpio.OUT);
-	gpioDAT.direction(gpio.OUT);
-
 	this._numPixels = 8;
 	this._pixels = [];
 
 	// Init pixels
-	for (var i = 0; i < this._numPixels; i++) {
+	for (let i = 0; i < this._numPixels; i++) {
 		this.setPixel(i, 255, 255, 255, 1.0);
 	}
 };
@@ -34,7 +28,7 @@ Blinkt.prototype.setup = function setup () {
  * @param {Number} a The pixel brightness value between 0.0 and 1.0.
  */
 Blinkt.prototype.setAllPixels = function setAllPixels (r, g, b, a) {
-	for (var i = 0; i < this._numPixels; i++) {
+	for (let i = 0; i < this._numPixels; i++) {
 		this.setPixel(i, r, g, b, a);
 	}
 };
@@ -85,7 +79,7 @@ Blinkt.prototype.setBrightness = function setBrightness (pixelNum, brightness) {
  * Sets all pixels to white.
  */
 Blinkt.prototype.clearAll = function clearAll () {
-	for (var i = 0; i < this._numPixels; i++) {
+	for (let i = 0; i < this._numPixels; i++) {
 		this.setPixel(i, 255, 255, 255);
 	}
 };
@@ -96,15 +90,12 @@ Blinkt.prototype.clearAll = function clearAll () {
  * pixels to change on the Blinkt! device.
  */
 Blinkt.prototype.sendUpdate = function sendUpdate () {
-	var i,
-		pixel;
-
-	for (i = 0; i < 4; i++) {
+	for (let i = 0; i < 4; i++) {
 		this._writeByte(0);
 	}
 
-	for (i = 0; i < this._numPixels; i++) {
-		pixel = this._pixels[i];
+	for (let i = 0; i < this._numPixels; i++) {
+		const pixel = this._pixels[i];
 
 		// Brightness
 		this._writeByte(0b11100000 | pixel[3]); // jshint ignore:line
@@ -125,14 +116,12 @@ Blinkt.prototype.sendUpdate = function sendUpdate () {
  * @private
  */
 Blinkt.prototype._writeByte = function writeByte (byte) {
-	var bit;
+	for (let i = 0 ; i < this._numPixels; i++) {
+		const bit = ((byte & (1 << (7 - i))) > 0) === true ? 1 : 0;
 
-	for (var i = 0 ; i < this._numPixels; i++) {
-		bit = ((byte & (1 << (7 - i))) > 0) === true ? gpio.HIGH : gpio.LOW;
-
-		gpioDAT.value(bit);
-		gpioCLK.value(gpio.HIGH);
-		gpioCLK.value(gpio.LOW);
+		dat.writeSync(bit);
+		clk.writeSync(1);
+		clk.writeSync(0);
 	}
 };
 
