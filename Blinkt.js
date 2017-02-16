@@ -1,11 +1,11 @@
 "use strict";
 
-var wpi = require('wiring-pi'),
-	DAT = 23,
-	CLK = 24,
-	Blinkt;
+var gpio = require('native-gpio');
 
-Blinkt = function () {};
+var gpioCLK = new gpio.GPIO(24);
+var gpioDAT = new gpio.GPIO(23);
+
+const Blinkt = function () {};
 
 /**
  * Connects to the GPIO and sets the GPIO pin modes. Must be called
@@ -13,12 +13,9 @@ Blinkt = function () {};
  * full brightness by default.
  */
 Blinkt.prototype.setup = function setup () {
-	// Set WPI to GPIO mode
-	wpi.setup('gpio');
-
 	// Set pin mode to output
-	wpi.pinMode(DAT, wpi.OUTPUT);
-	wpi.pinMode(CLK, wpi.OUTPUT);
+	gpioCLK.direction(gpio.OUT);
+	gpioDAT.direction(gpio.OUT);
 
 	this._numPixels = 8;
 	this._pixels = [];
@@ -131,11 +128,11 @@ Blinkt.prototype._writeByte = function writeByte (byte) {
 	var bit;
 
 	for (var i = 0 ; i < this._numPixels; i++) {
-		bit = ((byte & (1 << (7 - i))) > 0) === true ? wpi.HIGH : wpi.LOW; // jshint ignore:line
+		bit = ((byte & (1 << (7 - i))) > 0) === true ? gpio.HIGH : gpio.LOW;
 
-		wpi.digitalWrite(DAT, bit);
-		wpi.digitalWrite(CLK, 1);
-		wpi.digitalWrite(CLK, 0);
+		gpioDAT.value(bit);
+		gpioCLK.value(gpio.HIGH);
+		gpioCLK.value(gpio.LOW);
 	}
 };
 
