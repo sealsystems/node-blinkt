@@ -9,7 +9,7 @@
   ],
   "private": false,
   "dependencies": {
-    "onoff": "5.0.1"
+    "onoff": "6.0.1"
   },
   "engines": {
     "node": "*"
