@@ -41,7 +41,7 @@
     "babel-eslint": "^10.0.1",
     "eslint": "*",
     "eslint-config-irrelon": "^1.0.2",
-    "rimraf": "^2.6.3"
+    "rimraf": "^3.0.2"
   },
   "license": "ISC"
 }
